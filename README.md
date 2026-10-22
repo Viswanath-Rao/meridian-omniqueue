@@ -1,11 +1,14 @@
 # Meridian · OmniQueue
 ### Enterprise Incident Orchestration Platform & AI Triage Engine
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-meridian--omniqueue.vercel.app-success?style=for-the-badge&logo=vercel)](https://meridian-omniqueue.vercel.app)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![SQLite](https://img.shields.io/badge/Database-SQLite3_SQL-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![WebGL](https://img.shields.io/badge/UI-WebGL_Shader-990000?logo=webgl&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API)
-[![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel&logoColor=white)](https://vercel.com)
+
+> 🌐 **Live Web Application:** [https://meridian-omniqueue.vercel.app](https://meridian-omniqueue.vercel.app)  
+> 📖 **Interactive Swagger Docs:** [https://meridian-omniqueue.vercel.app/docs](https://meridian-omniqueue.vercel.app/docs)
 
 An asynchronous, multi-tiered incident management operating system featuring real-time NLP severity classification, dynamic Max-Heap SLA scheduling, $O(1)$ LRU caching, and an interactive WebGL operations dashboard.
 
