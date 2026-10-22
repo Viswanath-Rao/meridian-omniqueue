@@ -1,4 +1,4 @@
-"""
+﻿"""
 app.py - Enterprise Multi-Tier Ticket Orchestrator & DSA Atelier
 ===================================================================
 Production-Grade FastAPI Application combining:
@@ -107,7 +107,7 @@ async def lifespan(app: FastAPI):
     # Shutdown
 
 app = FastAPI(
-    title="Meridian · OmniQueue Enterprise Ticketing & DSA Atelier",
+    title="Meridian Â· OmniQueue Enterprise Ticketing & DSA Atelier",
     version="2.0.0",
     description="Advanced AI Triage, RBAC, and Live DSA Visualizer for Technical Portfolio",
     lifespan=lifespan
@@ -116,8 +116,11 @@ app = FastAPI(
 # Mount static directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
 static_dir = os.path.join(current_dir, "static")
-if not os.path.exists(static_dir):
-    os.makedirs(static_dir, exist_ok=True)
+try:
+    if not os.path.exists(static_dir):
+        os.makedirs(static_dir, exist_ok=True)
+except Exception:
+    pass
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 
@@ -534,7 +537,7 @@ async def get_analytics():
 if __name__ == "__main__":
     import uvicorn
     print("\n" + "="*70)
-    print(" Meridian · OmniQueue Enterprise Ticketing & DSA Atelier (v2.0)")
+    print(" Meridian Â· OmniQueue Enterprise Ticketing & DSA Atelier (v2.0)")
     print(" Active URL: http://127.0.0.1:8000")
     print(" Documentation: http://127.0.0.1:8000/docs")
     print("="*70 + "\n")

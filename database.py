@@ -16,7 +16,10 @@ import time
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 
-DB_FILE = os.path.join(os.path.dirname(__file__), "tickets_system.db")
+if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+    DB_FILE = "/tmp/tickets_system.db"
+else:
+    DB_FILE = os.path.join(os.path.dirname(__file__), "tickets_system.db")
 
 def get_db_connection() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_FILE)
