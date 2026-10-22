@@ -55,6 +55,51 @@ An asynchronous, multi-tiered incident management operating system featuring rea
 
 ---
 
+## 📐 System Working Architecture & DSA Flowchart
+
+```mermaid
+flowchart TD
+    subgraph Ingestion["1. Ingestion & NLP Triage"]
+        A["Client / Customer Incident Report"] --> B["NLP Triage Engine (Lexical Urgency + Sentiment Scoring)"]
+        B --> C{"AI Urgency Score & Routing Tier"}
+    end
+
+    subgraph MemoryDSA["2. Dual-Tier Dispatch & In-Memory DSA Engine"]
+        C -->|"Critical / High (Score >= 50)"| D["Priority Max-Heap O(log N)"]
+        C -->|"Medium / Low (Score < 50)"| E["FIFO Standard Queue O(1)"]
+        
+        D <-->|"Aging Tick (+1.5 pts/min)"| F["Anti-Starvation Aging Re-Heapifier"]
+        A -.->|"Tokenize & Index"| G["Prefix Trie O(L) Search Tree"]
+        
+        D --> H["Dispatch Daemon (Serve Next)"]
+        E --> H
+    end
+
+    subgraph CacheAndSQL["3. Memory Caching & SQL Persistence"]
+        H --> I["LRU Cache O(1) Doubly Linked List"]
+        I <-->|"O(1) Cache Hit / Miss Sync"| J[("SQLite Relational Database")]
+        H --> K["Circular Ring Buffer O(1) Telemetry Stream"]
+    end
+
+    subgraph Remediation["4. Incident Remediation Workflow (DAG)"]
+        H --> L["Remediation DAG (Kahn's Topological Sort)"]
+        L --> M["Step 1: Root Cause Triage"]
+        M --> N["Step 2: Isolate Failure Domain"]
+        N --> O["Step 3: Apply Hotfix / DB Replica Failover"]
+        O --> P["Step 4: Regression Tests & Production Close"]
+    end
+
+    classDef primary fill:#141210,stroke:#d4b483,stroke-width:1.5px,color:#ece6db;
+    classDef accent fill:#141210,stroke:#6fbfb0,stroke-width:1.5px,color:#ece6db;
+    classDef alert fill:#141210,stroke:#e07a5f,stroke-width:1.5px,color:#ece6db;
+    class A,B,C primary;
+    class D,F alert;
+    class E,G,H,I,K,L,M,N,O,P accent;
+    class J primary;
+```
+
+---
+
 ## 🚀 Running Locally
 
 1. **Clone the repository**:
@@ -75,22 +120,3 @@ An asynchronous, multi-tiered incident management operating system featuring rea
 4. Open your browser:
    - Web Application: **`http://127.0.0.1:8000`**
    - Interactive Swagger API: **`http://127.0.0.1:8000/docs`**
-
----
-
-## 🌐 Deploy to Vercel (Recommended)
-
-1. Push this repository to your GitHub.
-2. Go to [vercel.com](https://vercel.com) and click **"Add New Project"**.
-3. Import your `meridian-omniqueue` GitHub repository.
-4. Vercel will automatically detect `vercel.json` and deploy it instantly.
-5. Your live URL will be active (e.g. `https://meridian-omniqueue.vercel.app`).
-
----
-
-## 📄 Resume Project Summary
-
-- **Enterprise Incident Orchestrator & AI Triage Engine (Python, FastAPI, SQLite, WebGL)**:
-  - Engineered an asynchronous incident management platform evolving legacy single-queue mechanics into a dual-tier dispatch system with **FastAPI**, **SQLite**, and in-memory data structures.
-  - Built an automated **NLP Triage Pipeline** performing tokenization and distress scoring to calculate dynamic priority indices (1–100) and allocate automated SLA targets.
-  - Implemented core data structures from scratch: a **Binary Max-Heap** with anti-starvation dynamic aging ($O(\log N)$), an **LRU Cache** ($O(1)$), a **Prefix Trie** ($O(L)$), and an incident **DAG with Kahn's Topological Sort** ($O(V+E)$).
