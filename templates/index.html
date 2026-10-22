@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meridian · OmniQueue — Intelligent Ticket Orchestration & DSA Atelier</title>
+  <meta name="description" content="Production-grade AI triage, role-based access control, and live DSA visualizer built for technical portfolio." />
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+  <!-- Ambient Motion Canvas & Layers -->
+  <canvas id="field" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="pointer-glow" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"><span></span></div>
+
+  <!-- Primary Top Navigation -->
+  <header class="nav">
+    <div class="nav-left">
+      <a class="mark" href="#top">
+        <span class="mark-box" aria-hidden="true"></span>
+        Meridian · OmniQueue
+      </a>
+      <span class="badge-tag">v2.0 Enterprise DSA</span>
+    </div>
+
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#workspace">Ticket Desk</a>
+      <a href="#atelier">DSA Atelier</a>
+      <a href="#operations">Ops & Analytics</a>
+      <a href="/docs" target="_blank">Swagger API</a>
+    </nav>
+
+    <div class="nav-right">
+      <!-- Role Switcher Pill (RBAC) -->
+      <div class="role-picker" title="Switch active RBAC Role">
+        <button type="button" class="role-btn" data-role="CUSTOMER">Client</button>
+        <button type="button" class="role-btn" data-role="AGENT">Agent</button>
+        <button type="button" class="role-btn active" data-role="ADMIN">Admin Lead</button>
+      </div>
+
+      <button class="btn btn-sm magnetic" type="button" data-theme-toggle>
+        <span data-theme-label>Day</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Hero Header -->
+    <section class="hero">
+      <p class="kicker">
+        <span class="kicker-rule"></span>
+        Observatory 12 · Incident Orchestration Engine
+      </p>
+      <h1 class="display" data-kinetic="Watch the algorithm triage & route.">
+        Watch the algorithm triage & route.
+      </h1>
+      <p class="lede">
+        An enterprise incident platform evolving basic queue mechanics into an automated AI triage system: 
+        multi-factor NLP severity classification, dynamic Max-Heap anti-starvation scheduling, O(1) LRU caching, 
+        and live algorithmic state inspection.
+      </p>
+
+      <div style="display:flex; gap:0.9rem; flex-wrap:wrap; margin-top:2rem;">
+        <a class="btn btn-solid magnetic" href="#workspace">Open Ticket Desk</a>
+        <a class="btn btn-patina magnetic" href="#atelier">Inspect DSA Memory</a>
+        <button class="btn btn-danger magnetic admin-only" type="button" id="btn-simulate-surge">
+          Simulate Traffic Surge
+        </button>
+      </div>
+
+      <!-- Real-Time Metrics Strip -->
+      <div class="kpi-strip">
+        <div class="kpi-card">
+          <div class="kpi-label">Active Workload</div>
+          <div class="kpi-val" id="metric-active">--</div>
+          <div class="kpi-sub">Across All Tiers</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Critical Outages</div>
+          <div class="kpi-val" style="color:var(--ember);" id="metric-critical">--</div>
+          <div class="kpi-sub">SLA &lt; 1 Hour</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Priority Heap Depth</div>
+          <div class="kpi-val" style="color:var(--brass);" id="metric-priority-depth">--</div>
+          <div class="kpi-sub">O(log N) Min/Max Binary</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Standard Queue Depth</div>
+          <div class="kpi-val" style="color:var(--patina);" id="metric-standard-depth">--</div>
+          <div class="kpi-sub">O(1) FIFO Stream</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">LRU Cache Hit Rate</div>
+          <div class="kpi-val" id="metric-hit-rate">--%</div>
+          <div class="kpi-sub">O(1) Memory Lookups</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: TICKET WORKSPACE & RBAC DESK -->
+    <section class="section-box" id="workspace">
+      <span class="tick tl"></span><span class="tick tr"></span>
+      <span class="tick bl"></span><span class="tick br"></span>
+
+      <div class="box-header">
+        <div class="box-title">
+          <p class="kicker"><span class="kicker-rule"></span> Active Workspace</p>
+          <h2>Role: <span id="active-role-indicator" style="color:var(--brass);">ADMIN</span></h2>
+        </div>
+        <div style="font-family:var(--mono); font-size:0.75rem; color:var(--muted);">
+          SQLite Database + In-Memory Synchronized DSA State
+        </div>
+      </div>
+
+      <div class="workspace-grid">
+        <!-- Customer Submit Panel (Visible to Customer & Admin) -->
+        <aside class="workspace-sidebar" id="panel-customer">
+          <p class="kicker" style="margin-bottom:1rem;"><span class="kicker-rule"></span> Create Incident Ticket</p>
+          <form id="create-ticket-form">
+            <div class="form-group">
+              <label for="ticket-customer">Reporting Entity</label>
+              <input type="text" id="ticket-customer" class="form-input" value="Alex Chen (Client)" required />
+            </div>
+
+            <div class="form-group">
+              <label for="ticket-title">Incident Title</label>
+              <input type="text" id="ticket-title" class="form-input" placeholder="e.g. Database connection pool locked" required />
+            </div>
+
+            <div class="form-group">
+              <label for="ticket-desc">Detailed Description</label>
+              <textarea id="ticket-desc" class="form-textarea" placeholder="Include error codes, service impact, and symptoms..."></textarea>
+            </div>
+
+            <!-- Instant AI Triage Live Prediction Box -->
+            <div class="ai-triage-preview" id="ai-triage-preview" style="display:none;">
+              <div class="ai-triage-head">
+                <span>⚡ AI NLP TRIAGE PREDICTION</span>
+                <span id="ai-sla-val">--</span>
+              </div>
+              <div style="font-size:0.78rem; display:flex; justify-content:space-between;">
+                <span>Priority Score Index:</span>
+                <b id="ai-score-val" style="color:var(--brass);">0</b>
+              </div>
+              <div class="ai-score-bar">
+                <div class="ai-score-fill" id="ai-score-fill"></div>
+              </div>
+              <div class="ai-pill-row">
+                <span class="badge" id="ai-severity-badge">--</span>
+                <span class="badge badge-tier" id="ai-category-badge">--</span>
+              </div>
+              <p style="font-size:0.72rem; color:var(--muted); margin-top:0.5rem;" id="ai-action-text"></p>
+            </div>
+
+            <button type="submit" id="btn-submit-ticket" class="btn btn-solid magnetic" style="width:100%; margin-top:1.2rem;">
+              Submit & Auto-Triage
+            </button>
+          </form>
+        </aside>
+
+        <!-- Ticket Management Content -->
+        <div class="workspace-content">
+          <div class="table-toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="search-tickets" class="search-input" placeholder="Trie instant search (e.g. database, alex, security)..." />
+            </div>
+
+            <div style="display:flex; gap:0.6rem;">
+              <button type="button" class="btn btn-patina btn-sm magnetic agent-only" id="btn-serve-next">
+                ⚡ Serve Next Ticket
+              </button>
+            </div>
+          </div>
+
+          <!-- Ticket List -->
+          <div class="ticket-list" id="ticket-list">
+            <div class="ticket-card" onclick="window.omniApp?.openTicketModal(1)">
+              <div class="ticket-info">
+                <div class="ticket-meta">
+                  <span class="ticket-num">TCK-1001</span>
+                  <span class="badge badge-critical">CRITICAL</span>
+                  <span class="badge badge-tier">Heap Tier</span>
+                  <span style="font-family:var(--mono); font-size:0.68rem; color:var(--muted);">Score: 92.5</span>
+                  <span style="font-family:var(--mono); font-size:0.68rem; color:var(--muted);">· INFRASTRUCTURE</span>
+                </div>
+                <div class="ticket-title">Production Database Connection Pool Exhausted</div>
+                <div class="ticket-desc">High connection spike causing HTTP 500 across checkout API. Database threads locked.</div>
+              </div>
+              <div class="ticket-actions">
+                <span class="badge" style="background:color-mix(in srgb, var(--void) 60%, transparent); border:1px solid var(--line);">QUEUED</span>
+                <span class="sla-tag">Alex Chen (Client)</span>
+              </div>
+            </div>
+
+            <div class="ticket-card" onclick="window.omniApp?.openTicketModal(2)">
+              <div class="ticket-info">
+                <div class="ticket-meta">
+                  <span class="ticket-num">TCK-1002</span>
+                  <span class="badge badge-critical">CRITICAL</span>
+                  <span class="badge badge-tier">Heap Tier</span>
+                  <span style="font-family:var(--mono); font-size:0.68rem; color:var(--muted);">Score: 88.0</span>
+                  <span style="font-family:var(--mono); font-size:0.68rem; color:var(--muted);">· SECURITY</span>
+                </div>
+                <div class="ticket-title">Potential Security Breach: Unauthorized Token Influx</div>
+                <div class="ticket-desc">Suspicious IP range hitting admin endpoints with brute-force API authentication attempts.</div>
+              </div>
+              <div class="ticket-actions">
+                <span class="badge" style="background:color-mix(in srgb, var(--void) 60%, transparent); border:1px solid var(--line);">CLAIMED</span>
+                <span class="sla-tag">Alex Chen (Client)</span>
+              </div>
+            </div>
+
+            <div class="ticket-card" onclick="window.omniApp?.openTicketModal(3)">
+              <div class="ticket-info">
+                <div class="ticket-meta">
+                  <span class="ticket-num">TCK-1003</span>
+                  <span class="badge badge-high">HIGH</span>
+                  <span class="badge badge-tier">Heap Tier</span>
+                  <span style="font-family:var(--mono); font-size:0.68rem; color:var(--muted);">Score: 64.0</span>
+                  <span style="font-family:var(--mono); font-size:0.68rem; color:var(--muted);">· BILLING</span>
+                </div>
+                <div class="ticket-title">Stripe Double Billing Webhook Duplicate Charge</div>
+                <div class="ticket-desc">Customers reported being charged twice on annual plan invoice #INV-4921.</div>
+              </div>
+              <div class="ticket-actions">
+                <span class="badge" style="background:color-mix(in srgb, var(--void) 60%, transparent); border:1px solid var(--line);">QUEUED</span>
+                <span class="sla-tag">Alex Chen (Client)</span>
+              </div>
+            </div>
+
+            <div class="ticket-card" onclick="window.omniApp?.openTicketModal(4)">
+              <div class="ticket-info">
+                <div class="ticket-meta">
+                  <span class="ticket-num">TCK-1004</span>
+                  <span class="badge badge-medium">MEDIUM</span>
+                  <span class="badge badge-tier">FIFO Tier</span>
+                  <span style="font-family:var(--mono); font-size:0.68rem; color:var(--muted);">Score: 32.0</span>
+                  <span style="font-family:var(--mono); font-size:0.68rem; color:var(--muted);">· APPLICATION_BUG</span>
+                </div>
+                <div class="ticket-title">CSV Export Button Missing Date Range Filter</div>
+                <div class="ticket-desc">Customer reports the reports tab exports all historical rows instead of respecting filter.</div>
+              </div>
+              <div class="ticket-actions">
+                <span class="badge" style="background:color-mix(in srgb, var(--void) 60%, transparent); border:1px solid var(--line);">QUEUED</span>
+                <span class="sla-tag">Alex Chen (Client)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: LIVE DSA ATELIER & MEMORY VISUALIZER -->
+    <section class="section-box" id="atelier">
+      <span class="tick tl"></span><span class="tick tr"></span>
+      <span class="tick bl"></span><span class="tick br"></span>
+
+      <div class="box-header">
+        <div class="box-title">
+          <p class="kicker"><span class="kicker-rule"></span> Algorithmic State Inspector</p>
+          <h2>Live DSA Atelier</h2>
+        </div>
+        <div class="box-tabs">
+          <button type="button" class="tab-btn active" data-tab="heap">Priority Heap</button>
+          <button type="button" class="tab-btn" data-tab="queue">FIFO Queue</button>
+          <button type="button" class="tab-btn" data-tab="lru">LRU Cache</button>
+          <button type="button" class="tab-btn" data-tab="dag">Workflow DAG</button>
+          <button type="button" class="tab-btn" data-tab="ring">Circular Ring</button>
+        </div>
+      </div>
+
+      <div class="atelier-stage" id="atelier-stage">
+        <!-- Rendered by atelier.js -->
+      </div>
+    </section>
+
+    <!-- SECTION 3: OPERATIONS WAR-ROOM & LIVE SLA ANALYTICS CENTER -->
+    <section class="section-box" id="operations">
+      <span class="tick tl"></span><span class="tick tr"></span>
+      <span class="tick bl"></span><span class="tick br"></span>
+
+      <div class="box-header">
+        <div class="box-title">
+          <p class="kicker"><span class="kicker-rule"></span> Operations War-Room &amp; Telemetry</p>
+          <h2>Live SLA Analytics &amp; Incident Audit Center</h2>
+        </div>
+        <div style="display:flex; gap:0.6rem; align-items:center;">
+          <span class="badge badge-patina" id="live-sync-indicator">● LIVE DATABASE SYNC</span>
+          <button type="button" class="btn btn-sm magnetic" id="btn-refresh-analytics">Refresh Ops</button>
+        </div>
+      </div>
+
+      <div style="padding: 2rem;">
+        <!-- Top Analytics Row -->
+        <div class="analytics-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.2rem; margin-bottom:2rem;">
+          
+          <!-- SLA Compliance Card -->
+          <div style="padding:1.4rem; border:1px solid var(--line); background:var(--panel); border-radius:4px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
+              <span class="kicker">SLA Target Compliance</span>
+              <span class="badge badge-patina" id="sla-rate-badge">100%</span>
+            </div>
+            <div style="font-family:var(--display); font-size:2.4rem; font-weight:700; color:var(--patina);" id="sla-compliance-rate">--%</div>
+            <p style="font-size:0.75rem; color:var(--muted); margin:0.3rem 0 1rem;">
+              Calculated against dynamic SLA windows (1h Critical to 48h Low).
+            </p>
+            <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:0.72rem; border-top:1px solid var(--line); padding-top:0.6rem;">
+              <span>On-Time Targets: <b style="color:var(--patina);" id="sla-ontime-val">0</b></span>
+              <span>Breached: <b style="color:var(--ember);" id="sla-breached-val">0</b></span>
+            </div>
+          </div>
+
+          <!-- Severity Distribution Card -->
+          <div style="padding:1.4rem; border:1px solid var(--line); background:var(--panel); border-radius:4px;">
+            <span class="kicker" style="margin-bottom:0.8rem;">Incident Severity Spectrum</span>
+            <div style="display:grid; gap:0.55rem; margin-top:0.6rem;">
+              <div>
+                <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:0.7rem; margin-bottom:0.2rem;">
+                  <span style="color:var(--ember);">CRITICAL (1h SLA)</span>
+                  <span id="dist-critical-count">0</span>
+                </div>
+                <div style="height:6px; background:var(--line); border-radius:3px; overflow:hidden;">
+                  <div id="bar-critical" style="height:100%; width:0%; background:var(--ember); transition:width 0.4s var(--ease);"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:0.7rem; margin-bottom:0.2rem;">
+                  <span style="color:var(--gold);">HIGH (4h SLA)</span>
+                  <span id="dist-high-count">0</span>
+                </div>
+                <div style="height:6px; background:var(--line); border-radius:3px; overflow:hidden;">
+                  <div id="bar-high" style="height:100%; width:0%; background:var(--gold); transition:width 0.4s var(--ease);"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:0.7rem; margin-bottom:0.2rem;">
+                  <span style="color:var(--brass);">MEDIUM (12h SLA)</span>
+                  <span id="dist-medium-count">0</span>
+                </div>
+                <div style="height:6px; background:var(--line); border-radius:3px; overflow:hidden;">
+                  <div id="bar-medium" style="height:100%; width:0%; background:var(--brass); transition:width 0.4s var(--ease);"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:0.7rem; margin-bottom:0.2rem;">
+                  <span style="color:var(--patina);">LOW (48h SLA)</span>
+                  <span id="dist-low-count">0</span>
+                </div>
+                <div style="height:6px; background:var(--line); border-radius:3px; overflow:hidden;">
+                  <div id="bar-low" style="height:100%; width:0%; background:var(--patina); transition:width 0.4s var(--ease);"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Incident Category Telemetry -->
+          <div style="padding:1.4rem; border:1px solid var(--line); background:var(--panel); border-radius:4px;">
+            <span class="kicker" style="margin-bottom:0.8rem;">Incident Domain Distribution</span>
+            <div id="category-pills-container" style="display:flex; flex-direction:column; gap:0.5rem; margin-top:0.6rem;">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- On-Call Agent Fleet -->
+        <div style="margin-bottom:2rem;">
+          <p class="kicker" style="margin-bottom:0.8rem;"><span class="kicker-rule"></span> Active On-Call Response Team</p>
+          <div id="agent-workload-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem;">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Immutable SQL Audit Trail Table -->
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.9rem; flex-wrap:wrap; gap:0.8rem;">
+            <p class="kicker"><span class="kicker-rule"></span> Immutable SQLite Audit Log Trail</p>
+            <span style="font-family:var(--mono); font-size:0.7rem; color:var(--muted);">ACID-Compliant Persistent Transaction History</span>
+          </div>
+
+          <div style="max-height:360px; overflow-y:auto; border:1px solid var(--line); background:color-mix(in srgb, var(--void) 65%, transparent); border-radius:4px;">
+            <table style="width:100%; border-collapse:collapse; font-family:var(--mono); font-size:0.74rem; text-align:left;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--line); background:color-mix(in srgb, var(--panel) 90%, transparent); color:var(--muted);">
+                  <th style="padding:0.75rem 1rem;">Timestamp</th>
+                  <th style="padding:0.75rem 1rem;">Actor / Role</th>
+                  <th style="padding:0.75rem 1rem;">Action</th>
+                  <th style="padding:0.75rem 1rem;">Target</th>
+                  <th style="padding:0.75rem 1rem;">Transaction Details</th>
+                </tr>
+              </thead>
+              <tbody id="audit-table-body">
+                <!-- Dynamically populated from SQLite -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Meridian · OmniQueue v2.0 · B.Tech AI/ML Capstone Portfolio Edition</p>
+    <p>Built with FastAPI · SQLite · Pure DSA · WebGL Shader Motion</p>
+  </footer>
+
+  <!-- Ticket Detail & Resolution Modal -->
+  <div class="modal-overlay" id="ticket-modal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <span class="tick tl"></span><span class="tick tr"></span>
+      <span class="tick bl"></span><span class="tick br"></span>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
+        <span class="kicker" id="modal-ticket-num">TCK-1001</span>
+        <span class="badge badge-tier" id="modal-ticket-source">LRU_CACHE (O(1) Memory Hit)</span>
+      </div>
+
+      <h3 id="modal-ticket-title" style="font-family:var(--display); font-size:1.45rem; margin-bottom:0.8rem;"></h3>
+      <p id="modal-ticket-desc" style="color:var(--muted); line-height:1.55; margin-bottom:1.2rem; font-size:0.9rem;"></p>
+
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.6rem; padding:0.8rem; border:1px solid var(--line); background:var(--void); margin-bottom:1.2rem; font-family:var(--mono); font-size:0.75rem;">
+        <div><span style="color:var(--muted);">Reporter:</span> <div id="modal-ticket-customer" style="color:var(--ink); font-weight:600;"></div></div>
+        <div><span style="color:var(--muted);">Severity:</span> <div id="modal-ticket-severity" style="color:var(--ember); font-weight:600;"></div></div>
+        <div><span style="color:var(--muted);">Status:</span> <div id="modal-ticket-status" style="color:var(--brass); font-weight:600;"></div></div>
+      </div>
+
+      <div id="modal-agent-actions" style="display:flex; flex-direction:column; gap:0.8rem;">
+        <label style="font-family:var(--mono); font-size:0.68rem; color:var(--muted); text-transform:uppercase;">Resolution / Engineering Notes</label>
+        <textarea id="modal-resolution-notes" class="form-textarea" placeholder="Enter root cause, mitigation steps, or commit hash..."></textarea>
+        
+        <div style="display:flex; gap:0.6rem; justify-content:flex-end;">
+          <button type="button" class="btn btn-sm" onclick="window.omniApp.updateCurrentTicketStatus('IN_PROGRESS')">
+            Mark In Progress
+          </button>
+          <button type="button" class="btn btn-patina btn-sm" onclick="window.omniApp.updateCurrentTicketStatus('RESOLVED')">
+            ✓ Resolve Ticket
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-sm" id="btn-close-modal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="/static/js/webgl-field.js"></script>
+  <script src="/static/js/motion.js"></script>
+  <script src="/static/js/atelier.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
