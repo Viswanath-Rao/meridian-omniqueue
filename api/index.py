@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 
 # Add root directory to python path for seamless imports on Vercel

@@ -1,4 +1,4 @@
-﻿"""
+"""
 app.py - Enterprise Multi-Tier Ticket Orchestrator & DSA Atelier
 ===================================================================
 Production-Grade FastAPI Application combining:
